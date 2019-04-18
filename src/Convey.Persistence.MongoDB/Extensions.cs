@@ -1,9 +1,9 @@
+using Convey.Persistence.MongoDB.Initializers;
 using Convey.Persistence.MongoDB.Repositories;
+using Convey.Persistence.MongoDB.Seeders;
 using Convey.Types;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
-using Newtonsoft.Json.Serialization;
 
 namespace Convey.Persistence.MongoDB
 {
@@ -12,7 +12,8 @@ namespace Convey.Persistence.MongoDB
         private const string SectionName = "mongo";
         private const string RegistryName = "periosistence.MngoDb";
         
-        public static IConveyBuilder AddMongo(this IConveyBuilder builder, string sectionName = SectionName)
+        public static IConveyBuilder AddMongo(this IConveyBuilder builder, string sectionName = SectionName, 
+            IMongoDbSeeder seeder = null)
         {
             if (!builder.TryRegister(RegistryName))
             {
@@ -36,7 +37,17 @@ namespace Convey.Persistence.MongoDB
             });
 
             builder.Services.AddTransient<IMongoDbInitializer, MongoDbInitializer>();
-            builder.Services.AddTransient<IMongoDbSeeder, MongoDbSeeder>();
+
+            if (seeder is null)
+            {
+                builder.Services.AddSingleton<IMongoDbSeeder, MongoDbSeeder>();
+            }
+            else
+            {
+                builder.Services.AddSingleton(seeder);
+            }
+            
+            builder.AddInitializer<IMongoDbInitializer>();
 
             return builder;
         }

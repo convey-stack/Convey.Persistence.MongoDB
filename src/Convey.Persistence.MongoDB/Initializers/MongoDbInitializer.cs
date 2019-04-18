@@ -6,9 +6,9 @@ using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 
-namespace Convey.Persistence.MongoDB
+namespace Convey.Persistence.MongoDB.Initializers
 {
-    public class MongoDbInitializer : IMongoDbInitializer
+    internal sealed class MongoDbInitializer : IMongoDbInitializer
     {
         private static bool _initialized;
         private readonly bool _seed;
@@ -36,7 +36,7 @@ namespace Convey.Persistence.MongoDB
             {
                 return;
             }
-            await _seeder.SeedAsync();
+            await _seeder.SeedAsync(_database);
         }
 
         private void RegisterConventions()

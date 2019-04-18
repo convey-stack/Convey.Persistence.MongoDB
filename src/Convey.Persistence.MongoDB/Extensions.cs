@@ -1,3 +1,5 @@
+using System;
+using Convey.Persistence.MongoDB.Builders;
 using Convey.Persistence.MongoDB.Initializers;
 using Convey.Persistence.MongoDB.Repositories;
 using Convey.Persistence.MongoDB.Seeders;
@@ -11,8 +13,22 @@ namespace Convey.Persistence.MongoDB
     {
         private const string SectionName = "mongo";
         private const string RegistryName = "periosistence.MngoDb";
+
+        public static IConveyBuilder AddMongo(this IConveyBuilder builder, string sectionName = SectionName,
+            IMongoDbSeeder seeder = null)
+        {
+            var mongoOptions = builder.GetOptions<MongoDbOptions>(sectionName);
+            return builder.AddMongo(mongoOptions, seeder);
+        }
         
-        public static IConveyBuilder AddMongo(this IConveyBuilder builder, string sectionName = SectionName, 
+        public static IConveyBuilder AddMongo(this IConveyBuilder builder, Func<IMongoDbOptionsBuilder, 
+                IMongoDbOptionsBuilder> buildOptions, IMongoDbSeeder seeder = null)
+        {
+            var mongoOptions = buildOptions(new MongoDbOptionsBuilder()).Build();
+            return builder.AddMongo(mongoOptions, seeder);
+        }
+
+        public static IConveyBuilder AddMongo(this IConveyBuilder builder, MongoDbOptions mongoOptions, 
             IMongoDbSeeder seeder = null)
         {
             if (!builder.TryRegister(RegistryName))
@@ -20,7 +36,6 @@ namespace Convey.Persistence.MongoDB
                 return builder;
             }
             
-            var mongoOptions = builder.GetOptions<MongoDbOptions>(sectionName);
             builder.Services.AddSingleton(mongoOptions);
 
             builder.Services.AddSingleton(sp =>

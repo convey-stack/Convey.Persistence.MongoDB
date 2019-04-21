@@ -15,7 +15,7 @@ namespace Convey.Persistence.MongoDB.Initializers
         private readonly IMongoDatabase _database;
         private readonly IMongoDbSeeder _seeder;
 
-        public MongoDbInitializer(IMongoDatabase database, 
+        public MongoDbInitializer(IMongoDatabase database,
             IMongoDbSeeder seeder,
             MongoDbOptions options)
         {
@@ -24,26 +24,25 @@ namespace Convey.Persistence.MongoDB.Initializers
             _seed = options.Seed;
         }
 
-        public async Task InitializeAsync()
+        public Task InitializeAsync()
         {
             if (_initialized)
             {
-                return;
+                return Task.CompletedTask;
             }
+
             RegisterConventions();
             _initialized = true;
-            if (!_seed)
-            {
-                return;
-            }
-            await _seeder.SeedAsync(_database);
+
+            return _seed ? _seeder.SeedAsync(_database) : Task.CompletedTask;
         }
 
         private void RegisterConventions()
         {
             BsonSerializer.RegisterSerializer(typeof(decimal), new DecimalSerializer(BsonType.Decimal128));
-            BsonSerializer.RegisterSerializer(typeof(decimal?), new NullableSerializer<decimal>(new DecimalSerializer(BsonType.Decimal128)));
-            ConventionRegistry.Register("Conventions", new MongoDbConventions(), x => true);
+            BsonSerializer.RegisterSerializer(typeof(decimal?),
+                new NullableSerializer<decimal>(new DecimalSerializer(BsonType.Decimal128)));
+            ConventionRegistry.Register("convey_conventions", new MongoDbConventions(), x => true);
         }
 
         private class MongoDbConventions : IConventionPack

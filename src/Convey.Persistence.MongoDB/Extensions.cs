@@ -12,7 +12,7 @@ namespace Convey.Persistence.MongoDB
     public static class Extensions
     {
         private const string SectionName = "mongo";
-        private const string RegistryName = "periosistence.MngoDb";
+        private const string RegistryName = "persistence.mongoDb";
 
         public static IConveyBuilder AddMongo(this IConveyBuilder builder, string sectionName = SectionName,
             IMongoDbSeeder seeder = null)
@@ -20,22 +20,22 @@ namespace Convey.Persistence.MongoDB
             var mongoOptions = builder.GetOptions<MongoDbOptions>(sectionName);
             return builder.AddMongo(mongoOptions, seeder);
         }
-        
-        public static IConveyBuilder AddMongo(this IConveyBuilder builder, Func<IMongoDbOptionsBuilder, 
-                IMongoDbOptionsBuilder> buildOptions, IMongoDbSeeder seeder = null)
+
+        public static IConveyBuilder AddMongo(this IConveyBuilder builder, Func<IMongoDbOptionsBuilder,
+            IMongoDbOptionsBuilder> buildOptions, IMongoDbSeeder seeder = null)
         {
             var mongoOptions = buildOptions(new MongoDbOptionsBuilder()).Build();
             return builder.AddMongo(mongoOptions, seeder);
         }
 
-        public static IConveyBuilder AddMongo(this IConveyBuilder builder, MongoDbOptions mongoOptions, 
+        public static IConveyBuilder AddMongo(this IConveyBuilder builder, MongoDbOptions mongoOptions,
             IMongoDbSeeder seeder = null)
         {
             if (!builder.TryRegister(RegistryName))
             {
                 return builder;
             }
-            
+
             builder.Services.AddSingleton(mongoOptions);
 
             builder.Services.AddSingleton(sp =>
@@ -61,18 +61,19 @@ namespace Convey.Persistence.MongoDB
             {
                 builder.Services.AddSingleton(seeder);
             }
-            
+
             builder.AddInitializer<IMongoDbInitializer>();
 
             return builder;
         }
 
-        public static void AddMongoRepository<TEntity>(this IConveyBuilder builder, string collectionName)
-            where TEntity : IIdentifiable
-            => builder.Services.AddTransient<IMongoRepository<TEntity>>(sp =>
+        public static void AddMongoRepository<TEntity, TIdentifiable>(this IConveyBuilder builder,
+            string collectionName)
+            where TEntity : IIdentifiable<TIdentifiable>
+            => builder.Services.AddTransient<IMongoRepository<TEntity, TIdentifiable>>(sp =>
             {
                 var database = sp.GetService<IMongoDatabase>();
-                return new MongoRepository<TEntity>(database, collectionName);
+                return new MongoRepository<TEntity, TIdentifiable>(database, collectionName);
             });
     }
 }

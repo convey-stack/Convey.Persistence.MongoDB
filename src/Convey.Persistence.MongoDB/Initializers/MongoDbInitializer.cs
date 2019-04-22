@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
@@ -10,7 +11,7 @@ namespace Convey.Persistence.MongoDB.Initializers
 {
     internal sealed class MongoDbInitializer : IMongoDbInitializer
     {
-        private static bool _initialized;
+        private static int _initialized;
         private readonly bool _seed;
         private readonly IMongoDatabase _database;
         private readonly IMongoDbSeeder _seeder;
@@ -26,13 +27,12 @@ namespace Convey.Persistence.MongoDB.Initializers
 
         public Task InitializeAsync()
         {
-            if (_initialized)
+            if (Interlocked.Exchange(ref _initialized, 1) == 1)
             {
                 return Task.CompletedTask;
             }
 
             RegisterConventions();
-            _initialized = true;
 
             return _seed ? _seeder.SeedAsync(_database) : Task.CompletedTask;
         }

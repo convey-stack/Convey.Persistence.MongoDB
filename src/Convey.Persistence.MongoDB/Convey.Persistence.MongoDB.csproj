@@ -10,8 +10,8 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)' == 'Release'">
-    <PackageReference Include="Convey" Version="0.0.1-preview" />
-    <PackageReference Include="Convey.CQRS.Queries" Version="0.0.1-preview" />
+    <PackageReference Include="Convey" Version="0.0.3-preview" />
+    <PackageReference Include="Convey.CQRS.Queries" Version="0.0.3-preview" />
   </ItemGroup>
   
   <ItemGroup>

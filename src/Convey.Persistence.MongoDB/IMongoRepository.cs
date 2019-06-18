@@ -4,11 +4,13 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Convey.CQRS.Queries;
 using Convey.Types;
+using MongoDB.Driver;
 
 namespace Convey.Persistence.MongoDB
 {
 	public interface IMongoRepository<TEntity, in TIdentifiable> where TEntity : IIdentifiable<TIdentifiable>
 	{
+		IMongoCollection<TEntity> Collection { get; }
 		Task<TEntity> GetAsync(TIdentifiable id);
 		Task<TEntity> GetAsync(Expression<Func<TEntity, bool>> predicate);
 		Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate);

@@ -2,7 +2,7 @@ namespace Convey.Persistence.MongoDB.Builders
 {
     internal sealed class MongoDbOptionsBuilder : IMongoDbOptionsBuilder
     {
-        private MongoDbOptions _options = new MongoDbOptions();
+        private readonly MongoDbOptions _options = new MongoDbOptions();
         
         public IMongoDbOptionsBuilder WithConnectionString(string connectionString)
         {

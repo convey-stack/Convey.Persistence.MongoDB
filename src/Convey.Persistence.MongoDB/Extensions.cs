@@ -62,8 +62,6 @@ namespace Convey.Persistence.MongoDB
                 builder.Services.AddSingleton(seeder);
             }
 
-            builder.AddInitializer<IMongoDbInitializer>();
-
             return builder;
         }
 

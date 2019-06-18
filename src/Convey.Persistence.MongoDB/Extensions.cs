@@ -65,13 +65,17 @@ namespace Convey.Persistence.MongoDB
             return builder;
         }
 
-        public static void AddMongoRepository<TEntity, TIdentifiable>(this IConveyBuilder builder,
+        public static IConveyBuilder AddMongoRepository<TEntity, TIdentifiable>(this IConveyBuilder builder,
             string collectionName)
             where TEntity : IIdentifiable<TIdentifiable>
-            => builder.Services.AddTransient<IMongoRepository<TEntity, TIdentifiable>>(sp =>
+        {
+            builder.Services.AddTransient<IMongoRepository<TEntity, TIdentifiable>>(sp =>
             {
                 var database = sp.GetService<IMongoDatabase>();
                 return new MongoRepository<TEntity, TIdentifiable>(database, collectionName);
             });
+
+            return builder;
+        }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using Convey.Persistence.MongoDB.Builders;
+using Convey.Persistence.MongoDB.Factories;
 using Convey.Persistence.MongoDB.Initializers;
 using Convey.Persistence.MongoDB.Repositories;
 using Convey.Persistence.MongoDB.Seeders;
@@ -38,7 +39,7 @@ namespace Convey.Persistence.MongoDB
 
             builder.Services.AddSingleton(mongoOptions);
 
-            builder.Services.AddSingleton(sp =>
+            builder.Services.AddSingleton<IMongoClient>(sp =>
             {
                 var options = sp.GetService<MongoDbOptions>();
                 return new MongoClient(options.ConnectionString);
@@ -52,6 +53,7 @@ namespace Convey.Persistence.MongoDB
             });
 
             builder.Services.AddTransient<IMongoDbInitializer, MongoDbInitializer>();
+            builder.Services.AddTransient<IMongoSessionFactory, MongoSessionFactory>();
 
             if (seeder is null)
             {
